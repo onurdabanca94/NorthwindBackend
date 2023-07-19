@@ -1,4 +1,5 @@
 ﻿using Business.Abstract;
+using Core.Extensions;
 using Entities.Concrete;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -18,9 +19,10 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("getall")]
-        [Authorize("Product.List")]
+        //[Authorize("Product.List")]
         public IActionResult GetList()
         {
+            
             var result = _productService.GetList();
             if (result.Success)
             {
@@ -77,6 +79,18 @@ namespace WebAPI.Controllers
         public IActionResult Delete(Product product)
         {
             var result = _productService.Delete(product);
+            if (result.Success)
+            {
+                return Ok(result.Message);
+            }
+
+            return BadRequest(result.Message);
+        }
+
+        [HttpPost("transaction")]
+        public IActionResult TransactionTest(Product product)
+        {
+            var result = _productService.TransactionalOperation(product);
             if (result.Success)
             {
                 return Ok(result.Message);

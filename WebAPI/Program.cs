@@ -2,6 +2,9 @@ using Autofac;
 using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using Business.DependencyResolvers.Autofac;
+using Core.DependencyResolvers;
+using Core.Extensions;
+using Core.Utilities.IoC;
 using Core.Utilities.Security.Encryption;
 using Core.Utilities.Security.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -38,6 +41,11 @@ namespace WebAPI
                 };
             });
 
+            builder.Services.AddDependencyResolvers(new ICoreModule[]
+            {
+                new CoreModule(),
+            });
+
             builder.Services.AddControllers();
             builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 
@@ -45,6 +53,7 @@ namespace WebAPI
             {
                 builder.RegisterModule(new AutofacBusinessModule());
             });
+
             builder.Services.AddAuthorization(options =>
             {
                 options.AddPolicy("Product.List",
@@ -61,6 +70,8 @@ namespace WebAPI
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.ConfigureCustomExceptionMiddleware();
 
             app.UseHttpsRedirection();
             app.UseRouting();
